@@ -3,18 +3,17 @@
 set -e
 
 echo "${0} start!"
-echo "Var = USER_NAME = ${USER_NAME},  USER_UID = ${USER_UID}, USER_GID = ${USER_GID}"
+echo "Var : USER_NAME = ${USER_NAME},  USER_UID = ${USER_UID}, USER_GID = ${USER_GID}"
 
-# グループの作成 (既に存在する場合はスキップ)
-if ! getent group "${USER_NAME}" > /dev/null 2>&1; then
-    if ! getent group | grep -q "^[^:]*:[^:]*:${USER_GID}:"; then
-        echo "Creating group with name ${USER_NAME} and GID ${USER_GID}"
-        groupadd --gid "${USER_GID}" "${USER_NAME}"
-    else
-        echo "A group with GID ${USER_GID} already exists but does not match the name ${USER_NAME}."
-    fi
+# グループの作成 (groupadd の結果で分岐)
+if groupadd --gid "${USER_GID}" "${USER_NAME}" > /dev/null 2>&1; then
+    echo "Group ${USER_NAME} with GID ${USER_GID} created successfully."
 else
-    echo "Group with name ${USER_NAME} already exists."
+    if [ $? -eq 9 ]; then
+        echo "Group ${USER_NAME} already exists."
+    else
+        echo "Failed to create group ${USER_NAME} with GID ${USER_GID}. Please check for conflicts."
+    fi
 fi
 
 # ユーザーの作成 (既に存在する場合はスキップ)
