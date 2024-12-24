@@ -20,7 +20,8 @@ GIT_PS1_SHOWDIRTYSTATE=true
 GIT_PS1_SHOWUNTRACKEDFILES=true
 GIT_PS1_SHOWUPSTREAM=auto
 unset PROMPT_COMMAND
-export PS1="\[\033[01;32m\]\u@\h \[\033[01;33m\] \w \[\033[01;31m\]\$(__git_ps1 '(%s)') \n\[\033[01;34m\]\$ \[\033[00m\]"
+# export PS1="\[\033[01;32m\]\u@\h \[\033[01;33m\] \w \[\033[01;31m\]\$(__git_ps1 '(%s)') \n\[\033[01;34m\]\$ \[\033[00m\]"
+export PS1="\[\033[01;32m\]\u@\h \[\033[01;33m\] \w \[\033[01;31m\]\$(__git_ps1 '(%s)') \n\[\033[01;34m\]$(if [ \$(id -u) -eq 0 ]; then echo '#'; else echo '\$'; fi) \[\033[00m\]"
 EOF
 
 chmod a+x /usr/share/bash-completion/completions/git*
