@@ -6,11 +6,15 @@ echo "${0} start!"
 echo "Var = USER_NAME = ${USER_NAME},  USER_UID = ${USER_UID}, USER_GID = ${USER_GID}"
 
 # グループの作成 (既に存在する場合はスキップ)
-if ! getent group | grep -q "^[^:]*:[^:]*:${USER_GID}:"; then
-    echo "Creating group with GID ${USER_GID}"
-    groupadd --gid ${USER_GID} ${USER_NAME}
+if ! getent group "${USER_NAME}" > /dev/null 2>&1; then
+    if ! getent group | grep -q "^[^:]*:[^:]*:${USER_GID}:"; then
+        echo "Creating group with name ${USER_NAME} and GID ${USER_GID}"
+        groupadd --gid "${USER_GID}" "${USER_NAME}"
+    else
+        echo "A group with GID ${USER_GID} already exists but does not match the name ${USER_NAME}."
+    fi
 else
-    echo "Group with GID ${USER_GID} already exists."
+    echo "Group with name ${USER_NAME} already exists."
 fi
 
 # ユーザーの作成 (既に存在する場合はスキップ)
