@@ -3,10 +3,10 @@
 set -e
 
 echo "${0} start!"
-echo "Var = ${USER_NAME}, ${USER_UID}, ${USER_GID}"
+echo "Var = USER_NAME = ${USER_NAME},  USER_UID = ${USER_UID}, USER_GID = ${USER_GID}"
 
 # グループの作成 (既に存在する場合はスキップ)
-if ! getent group ${USER_GID} > /dev/null 2>&1; then
+if ! getent group | grep -q "^[^:]*:[^:]*:${USER_GID}:"; then
     echo "Creating group with GID ${USER_GID}"
     groupadd --gid ${USER_GID} ${USER_NAME}
 else
