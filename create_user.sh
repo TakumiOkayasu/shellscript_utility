@@ -5,15 +5,18 @@ set -e
 echo "${0} start!"
 echo "Var : USER_NAME = ${USER_NAME}, USER_UID = ${USER_UID}, USER_GID = ${USER_GID}"
 
-# グループの作成
-if getent group "${USER_NAME}" > /dev/null 2>&1; then
-    EXISTING_GID=$(getent group "${USER_NAME}" | cut -d: -f3)
-    if [ "$EXISTING_GID" -ne "$USER_GID" ]; then
-        echo "Warning: Group ${USER_NAME} already exists with a different GID (${EXISTING_GID}). Skipping group creation."
+# GIDの重複チェック
+EXISTING_GROUP=$(getent group "${USER_GID}" | cut -d: -f1)
+
+if [ -n "$EXISTING_GROUP" ]; then
+    if [ "$EXISTING_GROUP" != "$USER_NAME" ]; then
+        echo "Error: GID ${USER_GID} is already assigned to group '${EXISTING_GROUP}'."
+        exit 1
     else
-        echo "Group ${USER_NAME} already exists with GID ${USER_GID}."
+        echo "Group '${USER_NAME}' already exists with GID ${USER_GID}."
     fi
 else
+    # グループを作成
     if groupadd --gid "${USER_GID}" "${USER_NAME}"; then
         echo "Group ${USER_NAME} with GID ${USER_GID} created successfully."
     else
